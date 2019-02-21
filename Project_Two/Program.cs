@@ -21,7 +21,10 @@ namespace Project_Two
 			string gameCity { get; set; }
 			string gameState { get; set; }
 		}
-	
+		static void getData()//add an arguement in here to make the code work alter
+		{
+			//read from csv and update a list 
+		}
 
 
 		static void Main(string[] args)
