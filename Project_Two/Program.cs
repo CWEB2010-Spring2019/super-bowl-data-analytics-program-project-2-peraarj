@@ -21,13 +21,14 @@ namespace Project_Two
 			string backTwo = Directory.GetParent(backOne).ToString();
 			string backThree = Directory.GetParent(backTwo).ToString();
 			string csvFilePath = $@"{backThree}\Super_Bowl_Project.csv";
-			string printPath = $@"{backThree}\Game_Stats";
+			string printPath = $@"{backThree}\Game_Stats.txt";
 			
 			List<SuperBowl> gameRecords = new List<SuperBowl>();
 
 			RecordGenerator(csvFilePath, ref gameRecords);
 			StreamWriter writefile = new StreamWriter(printPath); //THIS IS THE INITIATION OF MY VARIABLE THAT IS EQUAL TO A STREAM WRITER TO THE ABOVE DECLARED FILE PATH
-			writefile.AutoFlush = true;	// THIS IS THE AUTOFLUSH METHOD CALL ON MY STREAM WRITER TO OVERCOME THE BUFFER LIMIT. 
+			writefile.AutoFlush = true; // THIS IS THE AUTOFLUSH METHOD CALL ON MY STREAM WRITER TO OVERCOME THE BUFFER LIMIT. 
+			Greeting(printPath);
 			WinnerGenerator(gameRecords, printPath, writefile);
 			TopFiveGenerator(gameRecords, printPath, writefile);
 			StateHosts(gameRecords, printPath, writefile);
@@ -37,6 +38,16 @@ namespace Project_Two
 			TeamWin(gameRecords, printPath, writefile);
 			TeamLose(gameRecords, printPath, writefile);
 			BigPointDiff(gameRecords, printPath, writefile);
+			AverageAttendance(gameRecords, printPath, writefile);
+		}
+
+		//Method to greet the user and explain the program. 
+		static void Greeting(string FilePath)
+		{
+			Console.WriteLine($"This program uses Super Bowl data from a spreadsheet to analyze and display Super Bowl stats out onto a text file");
+			Console.WriteLine($"The information will be printed out to the file path: {FilePath}");
+			Console.WriteLine("");
+			Console.WriteLine("You need not do anything. Look for the file with the game stats indicated above. Good Bye :)");
 		}
 		// create method to read from file and populate the super bowl stats into gameRecords List
 		static void RecordGenerator(string csvFilePath, ref List<SuperBowl> gameRecords)
@@ -56,7 +67,7 @@ namespace Project_Two
 				}
 				catch (Exception e)
 				{
-					Console.WriteLine(e.Message);
+					Console.WriteLine("File read successful");
 				}
 			}
 
@@ -78,6 +89,8 @@ namespace Project_Two
 				string output = String.Format("{0, -23} {1, -8} {2, -32} {3, -19} {4, -31} {5, -17}", record.winningTeam, record.Date, record.winningQB, record.winningCoach, record.MVP, record.PointDifference);
 				writefile.WriteLine(output);
 			}
+			writefile.WriteLine("");
+			writefile.WriteLine("");
 
 		}
 		static void TopFiveGenerator(List<SuperBowl> gameRecords, string printPath, StreamWriter writefile)
@@ -94,6 +107,8 @@ namespace Project_Two
 				string output = String.Format("{0, -8} {1, -23} {2, -23} {3, -16} {4, -15} {5, -17}", record.Date, record.winningTeam, record.losingTeam, record.gameCity, record.gameState, record.Stadium);
 				writefile.WriteLine(output);
 			}
+			writefile.WriteLine("");
+			writefile.WriteLine("");
 		}
 
 		static void StateHosts(List<SuperBowl> gameRecords, string printPath, StreamWriter writefile)
@@ -112,6 +127,8 @@ namespace Project_Two
 
 				writefile.WriteLine($"{SuperBowl.anotherGroup} have hosted the most superbowls with {SuperBowl.Count}. ");
 			}
+			writefile.WriteLine("");
+			writefile.WriteLine("");
 		}
 
 		static void MVPList(List<SuperBowl> gameRecords, string printPath, StreamWriter writefile)
@@ -129,6 +146,8 @@ namespace Project_Two
 				string output = String.Format($"{SuperBowl.anotherGroup} has won MVP {SuperBowl.Count} times. ");
 				writefile.WriteLine(output);
 			}
+			writefile.WriteLine("");
+			writefile.WriteLine("");
 		}
 			
 		static void CoachLose(List<SuperBowl> gameRecords, string printPath, StreamWriter writefile)
@@ -145,6 +164,8 @@ namespace Project_Two
 				string output = String.Format($"{SuperBowl.anotherGroup} as a coach has lost the Super Bowl {SuperBowl.Count} times. ");
 				writefile.WriteLine(output);
 			}
+			writefile.WriteLine("");
+			writefile.WriteLine("");
 		}
 			
 		static void CoachWin(List<SuperBowl> gameRecords, string printPath, StreamWriter writefile)
@@ -161,6 +182,8 @@ namespace Project_Two
 				string output = String.Format($"{SuperBowl.anotherGroup} as a coach has lost the Super Bowl {SuperBowl.Count} times. ");
 				writefile.WriteLine(output);
 			}
+			writefile.WriteLine("");
+			writefile.WriteLine("");
 		}
 
 		static void TeamWin(List<SuperBowl> gameRecords, string printPath, StreamWriter writefile)
@@ -177,6 +200,8 @@ namespace Project_Two
 				string output = String.Format($"The {SuperBowl.anotherGroup} has won the Super Bowl {SuperBowl.Count} times. ");
 				writefile.WriteLine(output);
 			}
+			writefile.WriteLine("");
+			writefile.WriteLine("");
 		}
 		static void TeamLose(List<SuperBowl> gameRecords, string printPath, StreamWriter writefile)
 		{
@@ -192,6 +217,8 @@ namespace Project_Two
 				string output = String.Format($"The {SuperBowl.anotherGroup} has won the Super Bowl {SuperBowl.Count} times. ");
 				writefile.WriteLine(output);
 			}
+			writefile.WriteLine("");
+			writefile.WriteLine("");
 		}
 		static void BigPointDiff(List<SuperBowl> gameRecords, string printPath, StreamWriter writefile)
 		{
@@ -205,15 +232,21 @@ namespace Project_Two
 				string output = String.Format($" Super Bowl({record.SB}), {record.winningTeam} against {record.losingTeam} in {record.Date} had the largest point difference of {record.PointDifference}.");
 				writefile.WriteLine(output);
 			}
+			writefile.WriteLine("");
+			writefile.WriteLine("");
 		}
 		static void AverageAttendance(List<SuperBowl> gameRecords, string printPath, StreamWriter writefile)
 		{
 			//What is the average attendance of all the superbowls
 			writefile.WriteLine("*******Super Bowl that had the biggest point differnce********");
-			var Avg = from SuperBowl in gameRecords
-					   group SuperBowl by SuperBowl.Attendance into newGroup
-					   select new { anotherGroup = newGroup.Key,  aVerage = newGroup.Average() };
-					  // (x => x.Attendance), } ;
+			int AttendanceTotal = 0;
+			foreach(SuperBowl record in gameRecords)
+			{
+				AttendanceTotal = AttendanceTotal + record.Attendance;
+			}
+			var AverageAttendance = AttendanceTotal / gameRecords.Count();
+			string output = String.Format($"The average attendance of all super bowl games over {gameRecords.Count()} SuperBowls is {AverageAttendance}.");
+			writefile.WriteLine(output);
 		}
 	}
 }
