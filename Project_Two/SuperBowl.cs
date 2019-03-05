@@ -20,6 +20,7 @@ namespace Project_Two
 		public string Stadium { get; set; }
 		public string gameCity { get; set; }
 		public string gameState { get; set; }
+		public int PointDifference { get; set; }
 
 		public SuperBowl(string Date, string SB, int Attendance, string winningQB, string winningCoach, string winningTeam, int winningPoints, string losingQB,
 			string losingCoach, string losingTeam, int losingPoints, string MVP, string Stadium, string gameCity, string gameState)
@@ -39,6 +40,7 @@ namespace Project_Two
 			this.Stadium = Stadium;
 			this.gameCity = gameCity;
 			this.gameState = gameState;
+			this.PointDifference = winningPoints - losingPoints;
 
 		}
 	}
