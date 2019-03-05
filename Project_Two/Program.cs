@@ -32,6 +32,11 @@ namespace Project_Two
 			TopFiveGenerator(gameRecords, printPath, writefile);
 			StateHosts(gameRecords, printPath, writefile);
 			MVPList(gameRecords, printPath, writefile);
+			CoachLose(gameRecords, printPath, writefile);
+			CoachWin(gameRecords, printPath, writefile);
+			TeamWin(gameRecords, printPath, writefile);
+			TeamLose(gameRecords, printPath, writefile);
+			BigPointDiff(gameRecords, printPath, writefile);
 		}
 		// create method to read from file and populate the super bowl stats into gameRecords List
 		static void RecordGenerator(string csvFilePath, ref List<SuperBowl> gameRecords)
@@ -115,12 +120,13 @@ namespace Project_Two
 			//output list of players who won the MVP more than twice
 			writefile.WriteLine("*******Players who have won MVP more than twice********");
 			var listMVP = from SuperBowl in gameRecords
-						  group SuperBowl by SuperBowl.MVP into group1
-						  where group1.Count() > 1
-						  select group1;
-			foreach (SuperBowl record in listMVP)
+						  group SuperBowl by SuperBowl.MVP into newGroup
+						  orderby newGroup.Count() descending
+						  select new { anotherGroup = newGroup.Key, Count = newGroup.Count() };
+			var grab = listMVP.Take(5);
+			foreach (var SuperBowl in grab)
 			{
-				string output = String.Format("{0, -8} {1, -23} {2, -23} ", record.winningQB, record.winningTeam, record.losingTeam);
+				string output = String.Format($"{SuperBowl.anotherGroup} has won MVP {SuperBowl.Count} times. ");
 				writefile.WriteLine(output);
 			}
 		}
@@ -128,15 +134,15 @@ namespace Project_Two
 		static void CoachLose(List<SuperBowl> gameRecords, string printPath, StreamWriter writefile)
 		{
 			//Which coach has lost the most SB
-			writefile.WriteLine("*******Players who have won MVP more than twice********");
-			var listMVP = from SuperBowl in gameRecords
-						  group SuperBowl by SuperBowl.MVP into group1
-						  orderby group1.Count() descending
-						  where group1.Count() > 1
-						  select group1;
-			foreach (SuperBowl record in listMVP)
+			writefile.WriteLine("*******Coaches who have Lost the most Super Bowls********");
+			var coachLoss = from SuperBowl in gameRecords
+						  group SuperBowl by SuperBowl.losingCoach into newGroup
+						  orderby newGroup.Count() descending
+						  select new { anotherGroup = newGroup.Key, Count = newGroup.Count() };
+			var grab = coachLoss.Take(1);
+			foreach (var SuperBowl in grab)
 			{
-				string output = String.Format("{0, -8} {1, -23} {2, -23} ", record.winningQB, record.winningTeam, record.losingTeam);
+				string output = String.Format($"{SuperBowl.anotherGroup} as a coach has lost the Super Bowl {SuperBowl.Count} times. ");
 				writefile.WriteLine(output);
 			}
 		}
@@ -144,15 +150,71 @@ namespace Project_Two
 		static void CoachWin(List<SuperBowl> gameRecords, string printPath, StreamWriter writefile)
 		{
 			//Which coach won the most SB
+			writefile.WriteLine("*******Coaches who have Won the most Super Bowls********");
+			var coachWon = from SuperBowl in gameRecords
+						  group SuperBowl by SuperBowl.winningCoach into newGroup
+						  orderby newGroup.Count() descending
+						  select new { anotherGroup = newGroup.Key, Count = newGroup.Count() };
+			var grab = coachWon.Take(1);
+			foreach (var SuperBowl in grab)
+			{
+				string output = String.Format($"{SuperBowl.anotherGroup} as a coach has lost the Super Bowl {SuperBowl.Count} times. ");
+				writefile.WriteLine(output);
+			}
 		}
 
+		static void TeamWin(List<SuperBowl> gameRecords, string printPath, StreamWriter writefile)
+		{
+			//Which team won the most super bowls. 
+			writefile.WriteLine("*******TEam that has Won the most Super Bowls********");
+			var TeamWon = from SuperBowl in gameRecords
+						  group SuperBowl by SuperBowl.winningTeam into newGroup
+						  orderby newGroup.Count() descending
+						  select new { anotherGroup = newGroup.Key, Count = newGroup.Count() };
+			var grab = TeamWon.Take(1);
+			foreach (var SuperBowl in grab)
+			{
+				string output = String.Format($"The {SuperBowl.anotherGroup} has won the Super Bowl {SuperBowl.Count} times. ");
+				writefile.WriteLine(output);
+			}
+		}
 		static void TeamLose(List<SuperBowl> gameRecords, string printPath, StreamWriter writefile)
 		{
 			//Which team(s) lost the most super bowls
+			writefile.WriteLine("*******Team that has lost the most Super Bowls********");
+			var TeamLoss = from SuperBowl in gameRecords
+						   group SuperBowl by SuperBowl.losingTeam into newGroup
+						   orderby newGroup.Count() descending
+						   select new { anotherGroup = newGroup.Key, Count = newGroup.Count() };
+			var grab = TeamLoss.Take(1);
+			foreach (var SuperBowl in grab)
+			{
+				string output = String.Format($"The {SuperBowl.anotherGroup} has won the Super Bowl {SuperBowl.Count} times. ");
+				writefile.WriteLine(output);
+			}
 		}
-
-
-		//
-
+		static void BigPointDiff(List<SuperBowl> gameRecords, string printPath, StreamWriter writefile)
+		{
+			//Which super bowl had the biggest point difference
+			writefile.WriteLine("*******Super Bowl that had the biggest point differnce********");
+			var PDiff = (from SuperBowl in gameRecords
+						   orderby SuperBowl.PointDifference descending
+						   select SuperBowl).Take(1);
+			foreach (SuperBowl record in PDiff)
+			{
+				string output = String.Format($" Super Bowl({record.SB}), {record.winningTeam} against {record.losingTeam} in {record.Date} had the largest point difference of {record.PointDifference}.");
+				writefile.WriteLine(output);
+			}
+		}
+		static void AverageAttendance(List<SuperBowl> gameRecords, string printPath, StreamWriter writefile)
+		{
+			//What is the average attendance of all the superbowls
+			writefile.WriteLine("*******Super Bowl that had the biggest point differnce********");
+			var Avg = from SuperBowl in gameRecords
+					   group SuperBowl by SuperBowl.Attendance into newGroup
+					   select new { anotherGroup = newGroup.Key,  aVerage = newGroup.Average() };
+					  // (x => x.Attendance), } ;
+		}
 	}
 }
+
