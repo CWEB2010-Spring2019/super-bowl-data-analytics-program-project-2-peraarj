@@ -22,14 +22,16 @@ namespace Project_Two
 			string backThree = Directory.GetParent(backTwo).ToString();
 			string csvFilePath = $@"{backThree}\Super_Bowl_Project.csv";
 			string printPath = $@"{backThree}\Game_Stats";
-
+			
 			List<SuperBowl> gameRecords = new List<SuperBowl>();
 
 			RecordGenerator(csvFilePath, ref gameRecords);
-
-			QueryGenerator(gameRecords, printPath);
-
-
+			StreamWriter writefile = new StreamWriter(printPath);
+			writefile.AutoFlush = true;
+			WinnerGenerator(gameRecords, printPath, writefile);
+			TopFiveGenerator(gameRecords, printPath, writefile);
+			StateHosts(gameRecords, printPath, writefile);
+			MVPList(gameRecords, printPath, writefile);
 		}
 		// create method to read from file and populate the super bowl stats into gameRecords List
 		static void RecordGenerator(string csvFilePath, ref List<SuperBowl> gameRecords)
@@ -37,7 +39,7 @@ namespace Project_Two
 			string[] myArray;//create an array for reading the data in initially. The array data type will help preserve the list of many items 
 			FileStream myFile = new FileStream(csvFilePath, FileMode.Open, FileAccess.Read);
 			StreamReader readFile = new StreamReader(myFile);
-			
+		
 
 			while (!readFile.EndOfStream)
 			{
@@ -52,51 +54,80 @@ namespace Project_Two
 					Console.WriteLine(e.Message);
 				}
 			}
+
 			readFile.Close();
 			myFile.Close();
 		}
 
-		static void QueryGenerator(List<SuperBowl> gameRecords, string printPath)
+		static void WinnerGenerator(List<SuperBowl> gameRecords, string printPath, StreamWriter writefile)
 		{
-			StreamWriter writefile = new StreamWriter(printPath);
-
 			//output list of Super Bowl winners
+			
+			
 			writefile.WriteLine("*******Super Bowl Winners********");
 			var Winners = from SuperBowl in gameRecords
 						  select SuperBowl;
-			foreach(SuperBowl record in Winners)
+			foreach (SuperBowl record in Winners)
 			{
-			
+
 				string output = String.Format("{0, -23} {1, -8} {2, -32} {3, -19} {4, -31} {5, -17}", record.winningTeam, record.Date, record.winningQB, record.winningCoach, record.MVP, record.PointDifference);
 				writefile.WriteLine(output);
 			}
 
-
+		}
+		static void TopFiveGenerator(List<SuperBowl> gameRecords, string printPath, StreamWriter writefile)
+		{
 			//ouput list fo top five attended super bowls
+			
+			
 			writefile.WriteLine("*******Top 5 attended Super Bowls********");
 			var topFive = (from SuperBowl in gameRecords
 						   orderby SuperBowl.Attendance descending
 						   select SuperBowl).Take(5);
-			foreach(SuperBowl record in topFive)
+			foreach (SuperBowl record in topFive)
 			{
 				string output = String.Format("{0, -8} {1, -23} {2, -23} {3, -16} {4, -15} {5, -17}", record.Date, record.winningTeam, record.losingTeam, record.gameCity, record.gameState, record.Stadium);
 				writefile.WriteLine(output);
 			}
+		}
 
+		static void StateHosts(List<SuperBowl> gameRecords, string printPath, StreamWriter writefile)
+		{
 			//output list of states that have hosted the most SB
+			
+			
 			writefile.WriteLine("*******States that have hosted the most superbowls********");
 			var topHosted = from SuperBowl in gameRecords
 							group SuperBowl by SuperBowl.gameState into newGroup
 							orderby newGroup.Count() descending
 							select new { anotherGroup = newGroup.Key, Count = newGroup.Count() };
-			var grab = topHosted.Take(1);
+			var grab = topHosted.Take(5);
 			foreach (var SuperBowl in grab)
 			{
-				
-				writefile.WriteLine($"{SuperBowl.anotherGroup} has hosted the most superbowls. ");
-			}
 
+				writefile.WriteLine($"{SuperBowl.anotherGroup} have hosted the most superbowls with {SuperBowl.Count}. ");
+			}
+		}
+
+		static void MVPList(List<SuperBowl> gameRecords, string printPath, StreamWriter writefile)
+		{
+			
 			//output list of players who won the MVP more than twice
+			writefile.WriteLine("*******Players who have won MVP more than twice********");
+			var listMVP = from SuperBowl in gameRecords
+						  group SuperBowl by SuperBowl.MVP into group1
+						  where group1.Count() > 1
+						  select group1;
+			foreach (SuperBowl record in listMVP)
+			{
+				string output = String.Format("{0, -8} {1, -23} {2, -23} ", record.winningQB, record.winningTeam, record.losingTeam);
+				writefile.WriteLine(output);
+			}
+		}
+			
+		static void CoachLose(List<SuperBowl> gameRecords, string printPath, StreamWriter writefile)
+		{
+			//Which coach has lost the most SB
 			writefile.WriteLine("*******Players who have won MVP more than twice********");
 			var listMVP = from SuperBowl in gameRecords
 						  group SuperBowl by SuperBowl.MVP into group1
@@ -108,13 +139,20 @@ namespace Project_Two
 				string output = String.Format("{0, -8} {1, -23} {2, -23} ", record.winningQB, record.winningTeam, record.losingTeam);
 				writefile.WriteLine(output);
 			}
-			//Which coach has lost the most SB
-
-			//Which coach won the most SB
-
-			//Which team(s) lost the most super bowls
-
-			//
 		}
+			
+		static void CoachWin(List<SuperBowl> gameRecords, string printPath, StreamWriter writefile)
+		{
+			//Which coach won the most SB
+		}
+
+		static void TeamLose(List<SuperBowl> gameRecords, string printPath, StreamWriter writefile)
+		{
+			//Which team(s) lost the most super bowls
+		}
+
+
+		//
+
 	}
 }
