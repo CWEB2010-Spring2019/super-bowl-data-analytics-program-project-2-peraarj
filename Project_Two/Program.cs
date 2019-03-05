@@ -26,8 +26,8 @@ namespace Project_Two
 			List<SuperBowl> gameRecords = new List<SuperBowl>();
 
 			RecordGenerator(csvFilePath, ref gameRecords);
-			StreamWriter writefile = new StreamWriter(printPath);
-			writefile.AutoFlush = true;
+			StreamWriter writefile = new StreamWriter(printPath); //THIS IS THE INITIATION OF MY VARIABLE THAT IS EQUAL TO A STREAM WRITER TO THE ABOVE DECLARED FILE PATH
+			writefile.AutoFlush = true;	// THIS IS THE AUTOFLUSH METHOD CALL ON MY STREAM WRITER TO OVERCOME THE BUFFER LIMIT. 
 			WinnerGenerator(gameRecords, printPath, writefile);
 			TopFiveGenerator(gameRecords, printPath, writefile);
 			StateHosts(gameRecords, printPath, writefile);
